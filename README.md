@@ -1,2 +1,2 @@
 # GoLog
-A simple logging framework for GoLang
+A simple logging tool for GoLang
