@@ -1,4 +1,9 @@
-package GoTest
+package GoLog
+
+import (
+	"fmt"
+	"os"
+)
 
 func loggerTest() {
 	logger := New(os.Stdout)

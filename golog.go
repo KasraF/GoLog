@@ -1,4 +1,4 @@
-package GoLang
+package GoLog
 
 import (
 	"fmt"
@@ -62,6 +62,8 @@ const (
 	CROSS_OUT  = "\u001b[9m"
 )
 
+const TIME_LAYOUT = "01/02/06 15:04:05.000000 MST"
+
 var gopath = os.Getenv("GOPATH")
 
 type Logger interface {
@@ -80,19 +82,7 @@ func New(writer io.Writer) Logger {
 }
 
 func (logger GoLogger) Log(s string, params ...interface{}) {
-	t, fileName, lineNumber := _getLogData();
-	
-	fmt.Fprintf(logger.writer,
-		"%s%s (%s[%d]) [%s] %s%s\n",
-		FG_GREEN,
-		t.Format("01/02/06 15:04:05 MST"),
-		fileName,
-		lineNumber,
-		"  LOG",
-		fmt.Sprintf(s, params...),
-		RESET);
-	
-	_log(logger, s, "  LOG", FG_GREEN, params...)
+	_log(logger, s, "LOG", FG_GREEN, params...)
 }
 
 func (logger GoLogger) Debug(s string, params ...interface{}) {
@@ -100,20 +90,20 @@ func (logger GoLogger) Debug(s string, params ...interface{}) {
 }
 
 func (logger GoLogger) Warn(s string, err error, params ...interface{}) {
-	_error(logger, s, " WARN", FG_MAGENTA, params...);
+	_error(logger, s, "WARN", FG_MAGENTA, err, params...);
 }
 
-func (logger GoLogger) Error(s string, err error, params ...interface{}) {
-	_error(logger, s, "ERROR", FG_RED, params...);
+func (logger GoLogger) Error(s string, err error,  params ...interface{}) {
+	_error(logger, s, "ERROR", FG_RED, err, params...);
 }
 
 func _log(logger GoLogger, s string, t string, color string, params ...interface{}) {
-	t, fileName, lineNumber := _getLogData();
+	tim, fileName, lineNumber := _getLogData();
 	
 	fmt.Fprintf(logger.writer,
 		"%s%s (%s[%d]) [%s] %s%s\n",
 		color,
-		t.Format("01/02/06 15:04:05 MST"),
+		tim.Format(TIME_LAYOUT),
 		fileName,
 		lineNumber,
 		t,
@@ -122,13 +112,13 @@ func _log(logger GoLogger, s string, t string, color string, params ...interface
 }
 
 func _error(logger GoLogger, s string, t string, color string, err error, params ...interface{}) {
-	t, fileName, lineNumber := _getLogData();
+	tim, fileName, lineNumber := _getLogData();
 	
 	if (err == nil) {
 		fmt.Fprintf(logger.writer,
 			"%s%s (%s[%d]) [%s] %s%s\n",
 			color,
-			t.Format("01/02/06 15:04:05 MST"),
+			tim.Format(TIME_LAYOUT),
 			fileName,
 			lineNumber,
 			t,
@@ -138,7 +128,7 @@ func _error(logger GoLogger, s string, t string, color string, err error, params
 		fmt.Fprintf(logger.writer,
 			"%s%s (%s[%d]) [%s] %s\n\tCause: %s%s\n",
 			color,
-			t.Format("01/02/06 15:04:05 MST"),
+			tim.Format(TIME_LAYOUT),
 			fileName,
 			lineNumber,
 			t,
@@ -149,7 +139,7 @@ func _error(logger GoLogger, s string, t string, color string, err error, params
 }
 
 func _getLogData() (time.Time, string, int) {
-	_, fileName, lineNumber, ok := runtime.Caller(2)
+	_, fileName, lineNumber, ok := runtime.Caller(3)
 
 	if !ok {
 		fileName = "FILENAME NOT RECOVERABLE"
