@@ -91,71 +91,57 @@ func (logger GoLogger) Log(s string, params ...interface{}) {
 		"  LOG",
 		fmt.Sprintf(s, params...),
 		RESET);
+	
+	_log(logger, s, "  LOG", FG_GREEN, params...)
 }
 
 func (logger GoLogger) Debug(s string, params ...interface{}) {
+	_log(logger, s, "DEBUG", FG_CYAN, params...)
+}
+
+func (logger GoLogger) Warn(s string, err error, params ...interface{}) {
+	_error(logger, s, " WARN", FG_MAGENTA, params...);
+}
+
+func (logger GoLogger) Error(s string, err error, params ...interface{}) {
+	_error(logger, s, "ERROR", FG_RED, params...);
+}
+
+func _log(logger GoLogger, s string, t string, color string, params ...interface{}) {
 	t, fileName, lineNumber := _getLogData();
 	
 	fmt.Fprintf(logger.writer,
 		"%s%s (%s[%d]) [%s] %s%s\n",
-		FG_CYAN,
+		color,
 		t.Format("01/02/06 15:04:05 MST"),
 		fileName,
 		lineNumber,
-		"DEBUG",
+		t,
 		fmt.Sprintf(s, params...),
 		RESET);
 }
 
-func (logger GoLogger) Warn(s string, err error, params ...interface{}) {
+func _error(logger GoLogger, s string, t string, color string, err error, params ...interface{}) {
 	t, fileName, lineNumber := _getLogData();
 	
 	if (err == nil) {
 		fmt.Fprintf(logger.writer,
 			"%s%s (%s[%d]) [%s] %s%s\n",
-			FG_MAGENTA,
+			color,
 			t.Format("01/02/06 15:04:05 MST"),
 			fileName,
 			lineNumber,
-			" WARN",
+			t,
 			fmt.Sprintf(s, params...),
 			RESET);
 	} else {
 		fmt.Fprintf(logger.writer,
 			"%s%s (%s[%d]) [%s] %s\n\tCause: %s%s\n",
-			FG_MAGENTA,
+			color,
 			t.Format("01/02/06 15:04:05 MST"),
 			fileName,
 			lineNumber,
-			" WARN",
-			fmt.Sprintf(s, params...),
-			err.Error(),
-			RESET);
-	}
-
-}
-
-func (logger GoLogger) Error(s string, err error, params ...interface{}) {
-	t, fileName, lineNumber := _getLogData();
-	
-	if (err == nil) {
-		fmt.Fprintf(logger.writer,
-			"%s%s (%s[%d]) [%s] %s%s\n",
-			FG_RED,
-			t.Format("01/02/06 15:04:05 MST"),
-			fileName,
-			lineNumber,
-			"ERROR",
-			fmt.Sprintf(s, params...),
-			RESET);
-	} else {
-		fmt.Fprintf(logger.writer,
-			"%s%s (%s[%d]) [%s] %s\n\tCause: %s%s\n",
-			FG_RED,
-			t.Format("01/02/06 15:04:05 MST"),
-			fileName,
-			lineNumber,
-			" ERROR",
+			t,
 			fmt.Sprintf(s, params...),
 			err.Error(),
 			RESET);
