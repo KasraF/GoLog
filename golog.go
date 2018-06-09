@@ -62,7 +62,7 @@ const (
 	CROSS_OUT  = "\u001b[9m"
 )
 
-const TIME_LAYOUT = "01/02/06 15:04:05.000000 MST"
+const TIME_LAYOUT = "01/02/06 15:04:05 MST"
 
 var gopath = os.Getenv("GOPATH")
 
