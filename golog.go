@@ -77,10 +77,6 @@ type GoLogger struct {
 	writer  io.Writer
 }
 
-func New(writer io.Writer) Logger {
-	return GoLogger{writer}
-}
-
 func (logger GoLogger) Log(s string, params ...interface{}) {
 	_log(logger, s, "LOG", FG_GREEN, params...)
 }
@@ -144,7 +140,7 @@ func _getLogData() (time.Time, string, int) {
 	if !ok {
 		fileName = "FILENAME NOT RECOVERABLE"
 		lineNumber = 0
-	} else  if strings.Contains(fileName, gopath) {
+	} else if strings.Contains(fileName, gopath) {
 		fileName = strings.Replace(fileName, gopath, "$GOPATH", 1)
 	}
 	

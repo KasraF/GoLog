@@ -7,6 +7,7 @@ import (
 
 func loggerTest() {
 	logger := New(os.Stdout)
+	
 	logger.Log("Hello %s!", "Log")
 	logger.Debug("Hello Debug!")
 	logger.Warn("Hello Warn!", nil)
