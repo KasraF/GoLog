@@ -66,34 +66,27 @@ const TIME_LAYOUT = "01/02/06 15:04:05 MST"
 
 var gopath = os.Getenv("GOPATH")
 
-type Logger interface {
-	Log(s string, params ...interface{})
-	Debug(s string, params ...interface{})
-	Warn(s string, err error, params ...interface{})
-	Error(s string, err error, params ...interface{})
-}
-
-type GoLogger struct {
+type Logger struct {
 	writer  io.Writer
 }
 
-func (logger GoLogger) Log(s string, params ...interface{}) {
+func (logger *Logger) Log(s string, params ...interface{}) {
 	_log(logger, s, "LOG", FG_GREEN, params...)
 }
 
-func (logger GoLogger) Debug(s string, params ...interface{}) {
+func (logger *Logger) Debug(s string, params ...interface{}) {
 	_log(logger, s, "DEBUG", FG_CYAN, params...)
 }
 
-func (logger GoLogger) Warn(s string, err error, params ...interface{}) {
+func (logger *Logger) Warn(s string, err error, params ...interface{}) {
 	_error(logger, s, "WARN", FG_MAGENTA, err, params...);
 }
 
-func (logger GoLogger) Error(s string, err error,  params ...interface{}) {
+func (logger *Logger) Error(s string, err error,  params ...interface{}) {
 	_error(logger, s, "ERROR", FG_RED, err, params...);
 }
 
-func _log(logger GoLogger, s string, t string, color string, params ...interface{}) {
+func _log(logger *Logger, s string, t string, color string, params ...interface{}) {
 	tim, fileName, lineNumber := _getLogData();
 	
 	fmt.Fprintf(logger.writer,
@@ -107,10 +100,10 @@ func _log(logger GoLogger, s string, t string, color string, params ...interface
 		RESET);
 }
 
-func _error(logger GoLogger, s string, t string, color string, err error, params ...interface{}) {
+func _error(logger *Logger, s string, t string, color string, err error, params ...interface{}) {
 	tim, fileName, lineNumber := _getLogData();
 	
-	if (err == nil) {
+	if err == nil {
 		fmt.Fprintf(logger.writer,
 			"%s%s (%s[%d]) [%s] %s%s\n",
 			color,
