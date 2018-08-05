@@ -71,7 +71,7 @@ type Logger struct {
 }
 
 func (logger *Logger) Log(s string, params ...interface{}) {
-	_log(logger, s, "LOG", FG_GREEN, params...)
+	_log(logger, s, "LOG  ", FG_GREEN, params...)
 }
 
 func (logger *Logger) Debug(s string, params ...interface{}) {
@@ -79,7 +79,7 @@ func (logger *Logger) Debug(s string, params ...interface{}) {
 }
 
 func (logger *Logger) Warn(s string, err error, params ...interface{}) {
-	_error(logger, s, "WARN", FG_MAGENTA, err, params...);
+	_error(logger, s, "WARN ", FG_MAGENTA, err, params...);
 }
 
 func (logger *Logger) Error(s string, err error,  params ...interface{}) {
@@ -90,12 +90,12 @@ func _log(logger *Logger, s string, t string, color string, params ...interface{
 	tim, fileName, lineNumber := _getLogData();
 	
 	fmt.Fprintf(logger.writer,
-		"%s%s (%s[%d]) [%s] %s%s\n",
+		"%s%s [%s] (%s[%d]) %s%s\n",
 		color,
 		tim.Format(TIME_LAYOUT),
+		t,
 		fileName,
 		lineNumber,
-		t,
 		fmt.Sprintf(s, params...),
 		RESET);
 }
@@ -105,22 +105,22 @@ func _error(logger *Logger, s string, t string, color string, err error, params 
 	
 	if err == nil {
 		fmt.Fprintf(logger.writer,
-			"%s%s (%s[%d]) [%s] %s%s\n",
+			"%s%s [%s] (%s[%d]) %s%s\n",
 			color,
 			tim.Format(TIME_LAYOUT),
+			t,
 			fileName,
 			lineNumber,
-			t,
 			fmt.Sprintf(s, params...),
 			RESET);
 	} else {
 		fmt.Fprintf(logger.writer,
-			"%s%s (%s[%d]) [%s] %s\n\tCause: %s%s\n",
+			"%s%s [%s] (%s[%d]) %s\n\tCause: %s%s\n",
 			color,
 			tim.Format(TIME_LAYOUT),
+			t,
 			fileName,
 			lineNumber,
-			t,
 			fmt.Sprintf(s, params...),
 			err.Error(),
 			RESET);
@@ -134,7 +134,7 @@ func _getLogData() (time.Time, string, int) {
 		fileName = "FILENAME NOT RECOVERABLE"
 		lineNumber = 0
 	} else if strings.Contains(fileName, gopath) {
-		fileName = strings.Replace(fileName, gopath, "$GOPATH", 1)
+		fileName = fileName[strings.LastIndex(fileName, "/") + 1:]
 	}
 	
 	return time.Now(), fileName, lineNumber
